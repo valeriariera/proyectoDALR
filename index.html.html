@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DALR Intelligence Core</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700;900&display=swap');
+        
+        body { 
+            font-family: 'Space Grotesk', sans-serif; 
+            background: #000002; 
+            margin: 0;
+            color: white;
+            overflow: hidden;
+        }
+
+        * { transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+        
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .animate-pulse-slow { animation: pulse-slow 4s infinite ease-in-out; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const Icon = ({ name, size = 24, className = "" }) => {
+            const iconRef = useRef(null);
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons({
+                        attrs: {
+                            class: className,
+                            'stroke-width': 2,
+                            width: size,
+                            height: size
+                        },
+                        nameAttr: 'data-lucide'
+                    });
+                }
+            }, [name, size, className]);
+            return <i data-lucide={name} ref={iconRef} className={className} style={{width: size, height: size, display: 'inline-block'}}></i>;
+        };
+
+        const FuturisticBackground = () => (
+            <div className="fixed inset-0 pointer-events-none overflow-hidden bg-[#000002] z-0">
+                <div className="absolute inset-0 opacity-60">
+                    <div className="absolute inset-0" 
+                         style={{ 
+                           backgroundImage: `linear-gradient(rgba(34, 211, 238, 0.2) 2px, transparent 2px), 
+                                             linear-gradient(90deg, rgba(34, 211, 238, 0.2) 2px, transparent 2px)`, 
+                           backgroundSize: '80px 80px',
+                           perspective: '400px',
+                           transform: 'perspective(400px) rotateX(55deg) translateY(-150px)',
+                           boxShadow: 'inset 0 0 100px #000'
+                         }}>
+                    </div>
+                </div>
+                <div className="absolute inset-0">
+                    {[...Array(30)].map((_, i) => (
+                        <div key={i} className="absolute rounded-full bg-cyan-400 shadow-[0_0_12px_#22d3ee] animate-pulse"
+                            style={{
+                                width: (Math.random() * 3 + 2) + 'px',
+                                height: (Math.random() * 3 + 2) + 'px',
+                                left: Math.random() * 100 + '%',
+                                top: Math.random() * 100 + '%',
+                                opacity: Math.random() * 0.6 + 0.4,
+                                animationDelay: Math.random() * 5 + 's',
+                                animationDuration: (Math.random() * 3 + 2) + 's'
+                            }}
+                        />
+                    ))}
+                </div>
+            </div>
+        );
+
+        const App = () => {
+            const [currentSlide, setCurrentSlide] = useState(0);
+            const [isAnimating, setIsAnimating] = useState(false);
+
+            const slides = [
+                {
+                    id: 'portada',
+                    title: 'IA EN LA DALR',
+                    content: (
+                        <div className="flex flex-col items-center justify-center text-center space-y-4 w-full max-w-4xl px-4">
+                            <div className="relative transform scale-90">
+                                <div className="absolute inset-0 blur-[35px] bg-cyan-400/40 rounded-full animate-pulse"></div>
+                                <div className="p-5 border-2 border-cyan-400 rounded-[2.5rem] bg-black/60 backdrop-blur-2xl">
+                                    <Icon name="brain-circuit" size={80} className="text-cyan-300 relative z-10" />
+                                </div>
+                            </div>
+                            <h1 className="text-4xl md:text-7xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-cyan-300 via-white to-purple-400 uppercase">
+                                IA EN LA DALR
+                            </h1>
+                        </div>
+                    )
+                },
+                {
+                    id: 'tablon',
+                    title: 'Tablón de Control',
+                    content: (
+                        <div className="flex flex-col items-center justify-center w-full max-w-6xl space-y-6 px-4">
+                            <h2 className="text-2xl md:text-4xl font-black tracking-[0.2em] text-cyan-400 uppercase drop-shadow-[0_0_15px_rgba(34,211,238,0.6)]">Tablón</h2>
+                            <div className="flex items-center justify-between w-full relative px-6 md:px-32">
+                                <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-cyan-400/30 -z-10"></div>
+                                {[
+                                    { label: 'Captura', icon: 'smartphone' },
+                                    { label: 'Núcleo AI', icon: 'settings' },
+                                    { label: 'Salida', icon: 'eye' }
+                                ].map((step, i) => (
+                                    <div key={i} className="flex flex-col items-center gap-2">
+                                        <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-black border border-cyan-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(34,211,238,0.2)]">
+                                            <Icon name={step.icon} size={24} className="text-cyan-300" />
+                                        </div>
+                                        <span className="text-[9px] md:text-[10px] font-black text-cyan-300 uppercase">{step.label}</span>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+                                {[
+                                    { title: 'Captura de Datos', color: 'cyan', items: [{ l: 'WhatsApp:', v: 'Recopilar información' }, { l: 'Google Forms:', v: 'Enviar información' }] },
+                                    { title: 'Procesamiento Central', color: 'purple', items: [{ l: 'Google Sheets:', v: 'Repositorio de datos' }, { l: 'AI:', v: 'Análisis de información' }] },
+                                    { title: 'Visualización Final', color: 'emerald', items: [{ l: 'Looker Studio:', v: 'Estructura del informe' }, { l: 'Google Sheets:', v: 'Presentación final' }] }
+                                ].map((box, i) => (
+                                    <div key={i} className={`p-4 border border-${box.color}-400/40 rounded-xl bg-black/40 backdrop-blur-md`}>
+                                        <h5 className={`text-[10px] font-black text-${box.color}-300 uppercase mb-3 flex items-center gap-2 border-b border-${box.color}-400/20 pb-2`}>
+                                            <div className={`w-1.5 h-1.5 bg-${box.color}-400 rounded-full animate-pulse`}></div> {box.title}
+                                        </h5>
+                                        {box.items.map((item, idx) => (
+                                            <div key={idx} className="mb-2 last:mb-0 leading-tight">
+                                                <span className={`text-[10px] font-black text-${box.color}-400 block uppercase`}>{item.l}</span>
+                                                <span className="text-[10px] text-white font-bold uppercase tracking-tight">{item.v}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )
+                },
+                {
+                    id: 'programa',
+                    title: 'PROGRAMA DE ENTRENAMIENTO',
+                    content: (
+                        <div className="flex flex-col items-center w-full max-w-6xl space-y-4 md:space-y-6 px-4">
+                            <div className="px-8 py-2 border-y-2 border-cyan-400 bg-cyan-500/10">
+                                <p className="text-center text-cyan-300 font-black italic text-xs md:text-base tracking-[0.4em] uppercase">// Protocolo de Integración</p>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 w-full">
+                                {[
+                                   { title: 'S1: DOMINANDO GEMINI', icon: 'message-square', items: ['Teoría Básica', 'Prompting']},
+                                   { title: 'S2: GEMS: ASISTENTES AUTOMATIZADOS', icon: 'cpu', items: ['Gems de Gemini', 'Módulo de Práctica'] },
+                                   { title: 'S3: ECOSISTEMA: SINCRONIZACIÓN WORKSPACE', icon: 'globe', items: ['Workspace AI', 'Notebook LM'] }
+                                ].map((sesion, i) => (
+                                    <div key={i} className="bg-black/80 border-2 border-cyan-500/50 p-4 rounded-2xl group transition-all">
+                                        <Icon name={sesion.icon} size={20} className="text-cyan-300 mb-3" />
+                                        <h4 className="text-md font-black text-white mb-3 uppercase">{sesion.title}</h4>
+                                        <ul className="text-[10px] space-y-1.5 text-white font-bold">
+                                            {sesion.items.map((item, idx) => (
+                                                <li key={idx} className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-cyan-400 rounded-sm"></div>{item}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )
+                },
+                {
+                    id: 'stack',
+                    title: 'REQUERIMIENTOS',
+                    content: (
+                        <div className="flex flex-col items-center justify-center w-full max-w-5xl space-y-6 md:space-y-8 px-4">
+                            <h2 className="text-2xl md:text-4xl font-black tracking-[0.2em] text-cyan-400 uppercase drop-shadow-[0_0_15px_rgba(34,211,238,0.6)]">
+                                Stack Tecnológico
+                            </h2>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full">
+                                {[
+                                    { name: 'Gemini Pro', icon: 'brain-circuit', color: 'text-blue-300' },
+                                    { name: 'Notebook LM', icon: 'brain-circuit', color: 'text-orange-300' },
+                                    { name: 'Groq AI', icon: 'brain-circuit', color: 'text-yellow-300' },
+                                    { name: 'Jina Reader', icon: 'brain-circuit', color: 'text-cyan-300' },
+                                    { name: 'Google AI Studio', icon: 'database', color: 'text-indigo-300' },
+                                    { name: 'Google Sites', icon: 'globe', color: 'text-blue-400' },
+                                    { name: 'Google App Script', icon: 'terminal', color: 'text-blue-400' },
+                                    { name: 'Looker Studio', icon: 'globe', color: 'text-blue-400' },
+                                    { name: 'WhatsApp Web', icon: 'message-square', color: 'text-green-300' },
+                                    { name: 'RRSS', icon: 'globe', color: 'text-pink-300' },
+                                    { name: 'Unidad Compartida', icon: 'share-2', color: 'text-pink-300' },
+                                ].map((item, i) => (
+                                    <div key={i} className="flex flex-col items-center justify-center p-3 border border-white/20 rounded-2xl bg-black/90 hover:border-cyan-300 transition-all group">
+                                        <Icon name={item.icon} size={18} className={`${item.color} mb-2 group-hover:scale-110 transition-transform`} />
+                                        <span className="text-[9px] font-black text-center tracking-widest uppercase text-white">{item.name}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )
+                },
+                {
+                    id: 'final',
+                    title: 'Sesión Finalizada',
+                    content: (
+                        <div className="flex flex-col items-center justify-center text-center space-y-8 w-full max-w-4xl px-4">
+                            <div className="space-y-4">
+                                <h1 className="text-6xl md:text-9xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-t from-purple-500 via-white to-cyan-300 uppercase leading-none drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+                                    ¡Gracias!
+                                </h1>
+                                <div className="h-1 w-24 bg-gradient-to-r from-transparent via-purple-500 to-transparent mx-auto"></div>
+                                <div className="inline-flex items-center gap-3 px-8 py-3 border border-white/10 bg-white/5 backdrop-blur-md rounded-full">
+                                    <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse shadow-[0_0_10px_#22d3ee]"></div>
+                                    <p className="text-xs md:text-sm font-bold tracking-[0.3em] text-white/80 uppercase">
+                                        Esta presentación fue hecha con <span className="text-cyan-400">Gemini AI</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="pt-12 opacity-30">
+                                <p className="font-mono text-[9px] tracking-[0.6em] uppercase text-white">// DALR_INTELLIGENCE: SESSION_CLOSED</p>
+                            </div>
+                        </div>
+                    )
+                }
+            ];
+
+            const handlePageChange = (direction) => {
+                if (isAnimating) return;
+                setIsAnimating(true);
+                setTimeout(() => {
+                    setCurrentSlide((prev) => {
+                        if (direction === 'next') return (prev + 1) % slides.length;
+                        return (prev - 1 + slides.length) % slides.length;
+                    });
+                    setIsAnimating(false);
+                }, 300);
+            };
+
+            // Seguro de renderizado
+            const slideData = slides[currentSlide] || slides[0];
+
+            return (
+                <div className="min-h-screen bg-[#000002] text-white overflow-hidden flex flex-col items-center relative">
+                    <FuturisticBackground />
+
+                    <div className="relative z-10 w-full max-w-7xl h-screen flex flex-col px-6 md:px-12 pt-12 pb-24">
+                        
+                        <header className="flex justify-between items-center w-full mb-12 border-b border-white/10 pb-4 shrink-0">
+                            <div className="flex items-center gap-3">
+                                <div className="w-6 h-6 border border-cyan-400 rotate-45 flex items-center justify-center bg-cyan-400/10">
+                                    <div className="w-1.5 h-1.5 bg-cyan-300"></div>
+                                </div>
+                                <span className="font-black tracking-[0.3em] text-[10px] text-white/80 uppercase">DALR // INTELLIGENCE</span>
+                            </div>
+                            <div className="flex gap-2">
+                                {slides.map((_, i) => (
+                                    <div key={i} className={`h-1 transition-all duration-500 rounded-full ${i === currentSlide ? 'w-8 bg-cyan-400 shadow-[0_0_8px_#22d3ee]' : 'w-2 bg-white/10'}`}></div>
+                                ))}
+                            </div>
+                        </header>
+
+                        <main className="flex-grow flex items-center justify-center w-full overflow-hidden relative">
+                            <div key={currentSlide} className={`w-full flex justify-center transition-all duration-300 ${isAnimating ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
+                                {slideData.content}
+                            </div>
+                        </main>
+
+                        <footer className="fixed bottom-4 left-6 right-6 md:left-12 md:right-12 z-50 flex justify-between items-center py-3 px-8 border border-white/5 bg-white/5 backdrop-blur-md rounded-full shadow-2xl">
+                            <div className="flex flex-col">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-lg font-black text-cyan-400">0{currentSlide + 1}</span>
+                                    <div className="w-6 h-[1px] bg-white/20"></div>
+                                    <span className="text-lg font-black text-white/10">0{slides.length}</span>
+                                </div>
+                                <div className="text-[8px] font-mono text-white/30 uppercase tracking-widest mt-0.5 whitespace-nowrap">
+                                   // {slideData.title}
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <button onClick={() => handlePageChange('prev')} className="p-2 border border-white/10 bg-white/5 hover:border-cyan-400 transition-all rounded-full group"><Icon name="chevron-left" size={16} className="text-white group-hover:text-cyan-300" /></button>
+                                <button onClick={() => handlePageChange('next')} className="p-2 border border-white/10 bg-white/5 hover:border-cyan-400 transition-all rounded-full group"><Icon name="chevron-right" size={16} className="text-white group-hover:text-cyan-300" /></button>
+                            </div>
+                        </footer>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
